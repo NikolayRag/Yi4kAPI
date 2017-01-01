@@ -1,4 +1,4 @@
-import socket, json, time, re
+import socket, json, time, re, os
 
 try:
 	from kiLog import *
@@ -117,6 +117,11 @@ class YiAPI():
 	def __init__(self, _ip=None):
 		if _ip:
 			self.ip= _ip
+
+		#sometimes camera couldnt be connected after a pause. Ping somehow helps to wake it.
+		for i in [0,1]:
+			os.system("ping -n 1 %s>nul" % self.ip)
+
 		try:
 			self.sock= socket.create_connection((self.ip,7878),3)
 		except:
