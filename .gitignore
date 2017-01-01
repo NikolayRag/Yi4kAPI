@@ -45,3 +45,12 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.sublime-project
+*.sublime-workspace
+*.sublime-commands
+gitk.exe
+tmp.py
+__pycache__
+build
+dist
+*.do
