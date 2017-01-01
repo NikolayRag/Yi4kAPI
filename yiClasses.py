@@ -1,7 +1,21 @@
 import socket, json, time, re
 
-from kiLog import *
-
+try:
+	from kiLog import *
+except:
+	class kiLog():
+		@staticmethod
+		def err():
+			None
+		@staticmethod
+		def warn():
+			None
+		@staticmethod
+		def ok():
+			None
+		@staticmethod
+		def vers():
+			None
 
 
 
