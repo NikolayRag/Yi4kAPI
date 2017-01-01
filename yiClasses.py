@@ -19,6 +19,9 @@ except:
 
 
 
+'''
+Public available commands.
+'''
 commands= []
 
 
