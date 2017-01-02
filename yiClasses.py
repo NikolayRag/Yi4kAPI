@@ -39,7 +39,7 @@ class YiAPICommand():
 
 	commandName= ''
 	params= None
-	names= None
+	variable= None
 
 	values= None
 
@@ -54,7 +54,7 @@ class YiAPICommand():
 		if not isinstance(variable, list) and not isinstance(variable, tuple):
 			variable= [variable]
 
-		self.names= variable
+		self.variable= variable
 
 
 		if values:
@@ -69,7 +69,7 @@ class YiAPICommand():
 
 	'''
 	Collect dict to be send to camera.
-	Append stored params to provided dict and apply _val to stored .names respectively
+	Append stored params to provided dict and apply _val to stored .variable respectively
 
 	Return complete suitable dict.
 	'''
@@ -77,11 +77,11 @@ class YiAPICommand():
 		_dict.update(self.params)
 
 
-		#assign provided _val[] values to stored .names[] parameters
+		#assign provided _val[] values to stored .variable[] parameters
 		if not isinstance(_val, list) and not isinstance(_val, tuple):
 			_val= [_val]
 
-		for pair in zip(self.names,_val):
+		for pair in zip(self.variable,_val):
 			_dict[pair[0]]= pair[1]
 
 
