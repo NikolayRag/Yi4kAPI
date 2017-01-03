@@ -5,16 +5,16 @@ try:
 except:
 	class kiLog():
 		@staticmethod
-		def err():
+		def err(v):
 			None
 		@staticmethod
-		def warn():
+		def warn(v):
 			None
 		@staticmethod
-		def ok():
+		def ok(v):
 			None
 		@staticmethod
-		def vers():
+		def vers(v):
 			None
 
 
