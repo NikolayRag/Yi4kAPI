@@ -146,7 +146,7 @@ class YiAPI():
 
 	'''
 	Run predefined _command.
-	if _vals provided, it's a value assigned to YiAPICommand.vals respectively. 
+	if _vals provided, it's a value assigned to YiAPICommand.values respectively. 
 	'''
 	def cmd(self, _command, _val=None):
 		if not self.sock:
