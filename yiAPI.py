@@ -1,6 +1,7 @@
 import socket, json, time, re, os
 
 from .yiAPICommand import *
+from .yiAPIListener import *
 
 
 try:
@@ -27,8 +28,6 @@ except:
 
 
 class YiAPI():
-	jsonTest= re.compile('Extra data: line \d+ column \d+ - line \d+ column \d+ \(char (?P<char>\d+) - \d+\)')
-
 	#private commands
 	startSession= YiAPICommand(257)
 	stopSession= YiAPICommand(258)
@@ -39,6 +38,7 @@ class YiAPI():
 	tick= 0
 	sessionId= 0
 
+	listener= None
 	res= []
 
 
@@ -63,6 +63,9 @@ class YiAPI():
 		except:
 			self.res= False
 			return
+
+
+		self.listener= YiAPIListener(self.sock)
 
 		res= self.cmd(self.startSession)
 		if res<0:
@@ -91,7 +94,7 @@ class YiAPI():
 
 
 		self.cmdSend(_command, _val)
-		self.res= self.jsonRestore( self.cmdRecv() )
+		self.res= self.listener.cmdRecv()
 		if not self.res:
 			kiLog.err('Invalid response')
 			return -99998
@@ -128,56 +131,3 @@ class YiAPI():
 		self.sock.sendall( bytes(json.dumps(out),'ascii') )
 
 		self.tick+= 1
-
-
-
-	'''
-	Recieve string from socket till its dry.
-	'''
-	def cmdRecv(self):
-		self.sock.settimeout(2)	#wait for a while for camera to execute command
-		res= b''
-
-		while True:
-			try:
-				recv= self.sock.recv(4096)
-				res+= recv
-
-				kiLog.verb("part: %s" % recv)
-
-				self.sock.settimeout(.1) #wait a little for detect end-of-data
-			except:
-				break
-
-		kiLog.verb("Recieved: %d bytes" % len(res))
-
-		return res.decode()
-
-
-
-	'''
-	Form array of json-restored values from string containing several json-encoded blocks
-	'''
-	def jsonRestore(self, _json):
-		jsonA= []
-
-		jsonFrom= 0
-		while True:
-			try:
-				jsonTry= json.loads(_json[jsonFrom:])
-				jsonA.append(jsonTry)	#rest
-				break	#json ended up
-			except Exception as exc:
-				kiLog.verb('Json result: ' +str(exc))
-				
-				jsonErr= self.jsonTest.match(str(exc))
-				if not jsonErr:
-					return False
-
-				jsonFrom2= int(jsonErr.group('char'))
-				jsonA.append( json.loads(_json[jsonFrom:jsonFrom+jsonFrom2]) )
-
-				jsonFrom+= jsonFrom2
-
-
-		return(jsonA)
