@@ -30,7 +30,7 @@ Commands not implemented:
 
 
 
-from .yiClasses import *
+from .yiAPI import *
 
 
 '''
