@@ -18,7 +18,7 @@ except:
 		def ok(v):
 			None
 		@staticmethod
-		def vers(v):
+		def verb(v):
 			None
 
 
