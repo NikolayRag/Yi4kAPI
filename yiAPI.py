@@ -41,7 +41,7 @@ class YiAPI():
 		#sometimes camera couldnt be connected after a pause. Try to connect several times.
 		for i in range(0,5):
 			try:
-				self.sock= socket.create_connection((self.ip,7878),.5)
+				self.sock= socket.create_connection((self.ip,7878),1)
 				break
 			except:
 				None
