@@ -48,9 +48,13 @@ class YiAPIListener(threading.Thread):
 
 
 			for resJSON in responseA:
-				logging.info('Listen: res= %s' % str(resJSON))
 				logging.info('Res %s' % str(resJSON))
-				
+				if not 'msg_id' in resJSON:
+					logging.warning('Insufficient response, no msg_id')
+
+					continue
+
+
 				cId= resJSON['msg_id']
 				cbA= self.assignedCB
 
