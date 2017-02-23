@@ -54,14 +54,16 @@ class YiAPI():
 		if _ip:
 			self.ip= _ip
 
-		#sometimes camera couldnt be connected after a pause. Ping somehow helps to wake it.
-		for i in [0,1]:
-			os.system("ping -n 1 %s>nul" % self.ip)
+		#sometimes camera couldnt be connected after a pause. Try to connect several times.
+		for i in range(0,5):
+			try:
+				self.sock= socket.create_connection((self.ip,7878),.5)
+				break
+			except:
+				None
 
-		try:
-			self.sock= socket.create_connection((self.ip,7878),3)
-		except:
-			self.res= False
+		if not self.sock:
+			print('Not connected')
 			return
 
 
