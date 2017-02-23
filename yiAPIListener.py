@@ -1,64 +1,115 @@
+import logging
+import re, json, threading
+
+
 '''
 Constantly listen to opened Yi4k camera for sultable response.
 Most of response will be the result of commands sent to camera, while some of the responce
 is camera state, pushed periodically.
 '''
 
-class YiAPIListener():
+class YiAPIListener(threading.Thread):
 	jsonTest= re.compile('Extra data: line \d+ column \d+ - line \d+ column \d+ \(char (?P<char>\d+) - \d+\)')
+
+	inputBuffer= ''
+	assignedCB= {}	#msgId:cb collection
+	constantCB= {}
 
 
 	def __init__(self, _sock):
+		threading.Thread.__init__(self)
+
 		self.sock= _sock
+		self.inputBuffer= ''
+		self.assignedCB= {}
+		self.constantCB= {}
+
+		self.start()
 
 
-	'''
-	Recieve string from socket till its dry.
-	'''
-	def cmdRecv(self):
-		self.sock.settimeout(2)	#wait for a while for camera to execute command
-		res= b''
 
+
+
+	def run(self):
 		while True:
+			logging.info('Listen...')
 			try:
-				recv= self.sock.recv(4096)
-				res+= recv
-
-				kiLog.verb("part: %s" % recv)
-
-				self.sock.settimeout(.1) #wait a little for detect end-of-data
+				recv= self.sock.recv(1024)
 			except:
-				break
+				logging.info("Listener stopped")
+				return
 
-		kiLog.verb("Recieved: %d bytes" % len(res))
-
-		return self.jsonRestore( res.decode() )
-
+			logging.debug("Listen: part: %d" % len(recv))
+			self.inputBuffer+= (recv.decode())
 
 
-	'''
-	Form array of json-restored values from string containing several json-encoded blocks
-	'''
-	def jsonRestore(self, _json):
-		jsonA= []
+			responseA, jsonDone= self.jsonRestore(self.inputBuffer)
+			self.inputBuffer= self.inputBuffer[jsonDone:]
 
-		jsonFrom= 0
-		while True:
-			try:
-				jsonTry= json.loads(_json[jsonFrom:])
-				jsonA.append(jsonTry)	#rest
-				break	#json ended up
-			except Exception as exc:
-				kiLog.verb('Json result: ' +str(exc))
+
+			for resJSON in responseA:
+				logging.info('Listen: res= %s' % str(resJSON))
 				
+				cId= resJSON['msg_id']
+				cbA= self.assignedCB
+
+				if (cId in cbA) and callable(cbA[cId]):
+					logging.info('Listen.Callback')
+
+					cbA[cId](resJSON)
+					del cbA[cId]
+
+
+				cbA= self.constantCB
+
+				if (cId in cbA) and callable(cbA[cId]):
+					logging.info('Listen.Callback static')
+					cbA[cId](resJSON)
+
+
+
+	'''
+	Assign callback for awaited command responce.
+	'''
+	def assign(self, _msgId, _cb):
+		self.assignedCB[_msgId]= _cb
+
+
+
+
+
+
+
+
+#########
+#PRIVATE#
+#########
+
+
+	'''
+	Detect json-restored values from string containing several json-encoded blocks.
+
+	Return array of detected json found.
+	'''
+	def jsonRestore(self, _jsonStr):
+		jsonDone= 0
+		responseA= []
+
+		while True:
+			#try full, then try part
+			try:
+				jsonTry= json.loads(_jsonStr[jsonDone:])
+				responseA.append(jsonTry)	#rest
+				
+				return responseA, len(_jsonStr)	#json ended up
+
+			except Exception as exc:
 				jsonErr= self.jsonTest.match(str(exc))
-				if not jsonErr:
-					return False
+				if not jsonErr:	#assumed unfinished json
+					return responseA, jsonDone
 
-				jsonFrom2= int(jsonErr.group('char'))
-				jsonA.append( json.loads(_json[jsonFrom:jsonFrom+jsonFrom2]) )
+				jsonLen= int(jsonErr.group('char'))
+				responseA.append( json.loads(_jsonStr[jsonDone:jsonDone+jsonLen]) )
 
-				jsonFrom+= jsonFrom2
+				jsonDone+= jsonLen
 
-
-		return(jsonA)

@@ -1,4 +1,4 @@
-import socket, json, time, re, os
+import socket, json, threading
 
 from .yiAPICommand import *
 from .yiAPIListener import *
@@ -39,7 +39,6 @@ class YiAPI():
 	sessionId= 0
 
 	listener= None
-	res= []
 
 
 
@@ -67,12 +66,12 @@ class YiAPI():
 			return
 
 
+		self.sock.settimeout(None)
 		self.listener= YiAPIListener(self.sock)
 
 		res= self.cmd(self.startSession)
 		if res<0:
 			self.sock= None
-			self.res= False
 		else:
 			self.sessionId= res
 
@@ -81,6 +80,8 @@ class YiAPI():
 	def close(self):
 		self.cmd(self.stopSession)
 
+		if self.sock:
+			self.sock.close()
 		self.sock= None
 
 
@@ -89,33 +90,37 @@ class YiAPI():
 	Run predefined _command.
 	if _vals provided, it's a value assigned to YiAPICommand.values respectively. 
 	'''
-	def cmd(self, _command, _val=None):
+	def cmd(self, _command, _val=None, cb=None):
 		if not self.sock:
 			kiLog.err('Camera disconnected')
 			return -99999
 
 
+		cbEvent= None
+		if not cb:
+			cb, cbEvent= self.blockingCB()
+
+		self.listener.assign(_command.params['msg_id'], cb)
+		
 		self.cmdSend(_command, _val)
-		self.res= self.listener.cmdRecv()
-		if not self.res:
-			kiLog.err('Invalid response')
-			return -99998
+		self.tick+= 1
 
+		if not cbEvent:	#external callback supplied, exit at once
+			return
 
-		res= {'rval':0}
-		if len(self.res):
-			for res in self.res:	#find block with rval
-				if 'rval' in res:
-					break
+		#
 
+		cbEvent.wait()
+		res= cbEvent.res 	#bound by generated cb, see blockingCB()
+		print('res', res)
 
-		if 'rval' in res and res['rval']:
+		if res['rval']:
 			kiLog.err('Camera error: %d' % res['rval'])
-			kiLog.verb('Full result: %s' % str(self.res))
+			kiLog.verb('Full result: %s' % str(res))
 			return res['rval']
 
-		if callable(_command.resultCB):
-			return _command.resultCB(res)
+#		if callable(_command.resultCB):
+#			return _command.resultCB(res)
 
 		if 'param' in res:
 			return res['param']
@@ -132,4 +137,19 @@ class YiAPI():
 		
 		self.sock.sendall( bytes(json.dumps(out),'ascii') )
 
-		self.tick+= 1
+
+
+	'''
+	Generate callback suitable for supplying to YiAPIListener.assing()
+	and Event fired at callback call.
+	'''
+	def blockingCB(self):
+		cbEvent= threading.Event()
+		cbEvent.res= False
+		
+		def func(_res):
+			cbEvent.res= _res
+			cbEvent.set()
+
+		return (func, cbEvent)
+
