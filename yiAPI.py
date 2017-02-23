@@ -1,25 +1,10 @@
+import logging
+
 import socket, json, threading
 
 from .yiAPICommand import *
 from .yiAPIListener import *
 
-
-try:
-	from kiLog import *
-except:
-	class kiLog():
-		@staticmethod
-		def err(v):
-			None
-		@staticmethod
-		def warn(v):
-			None
-		@staticmethod
-		def ok(v):
-			None
-		@staticmethod
-		def verb(v):
-			None
 
 
 
@@ -62,7 +47,7 @@ class YiAPI():
 				None
 
 		if not self.sock:
-			print('Not connected')
+			logging.critical('Not connected')
 			return
 
 
@@ -92,7 +77,7 @@ class YiAPI():
 	'''
 	def cmd(self, _command, _val=None, cb=None):
 		if not self.sock:
-			kiLog.err('Camera disconnected')
+			logging.error('Camera disconnected')
 			return -99999
 
 
@@ -108,15 +93,15 @@ class YiAPI():
 		if not cbEvent:	#external callback supplied, exit at once
 			return
 
-		#
+		#blocked branch from here
 
 		cbEvent.wait()
 		res= cbEvent.res 	#bound by generated cb, see blockingCB()
-		print('res', res)
+		logging.info('Result= %s' % res)
 
 		if res['rval']:
-			kiLog.err('Camera error: %d' % res['rval'])
-			kiLog.verb('Full result: %s' % str(res))
+			logging.warning('Camera error: %d' % res['rval'])
+			logging.debug('Full result: %s' % str(res))
 			return res['rval']
 
 #		if callable(_command.resultCB):
@@ -133,7 +118,7 @@ class YiAPI():
 	def cmdSend(self, _command, _val=None):
 		out= _command.apply({'token':self.sessionId, 'heartbeat':self.tick}, _val)
 
-		kiLog.verb("Send: %s" % out)
+		logging.debug("Send: %s" % out)
 		
 		self.sock.sendall( bytes(json.dumps(out),'ascii') )
 
