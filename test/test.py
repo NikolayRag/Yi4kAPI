@@ -1,6 +1,4 @@
-import logging
-logging.basicConfig(level= logging.DEBUG)
-
+import kilog
 
 import sys, os
 sys.path.append(os.path.abspath('../..'))

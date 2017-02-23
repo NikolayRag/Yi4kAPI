@@ -32,14 +32,14 @@ class YiAPIListener(threading.Thread):
 
 	def run(self):
 		while True:
-			logging.info('Listen...')
+			logging.info('Wait...')
 			try:
 				recv= self.sock.recv(1024)
 			except:
-				logging.info("Listener stopped")
+				logging.info("...stopped")
 				return
 
-			logging.debug("Listen: part: %d" % len(recv))
+			logging.debug("Part %db" % len(recv))
 			self.inputBuffer+= (recv.decode())
 
 
@@ -49,12 +49,13 @@ class YiAPIListener(threading.Thread):
 
 			for resJSON in responseA:
 				logging.info('Listen: res= %s' % str(resJSON))
+				logging.info('Res %s' % str(resJSON))
 				
 				cId= resJSON['msg_id']
 				cbA= self.assignedCB
 
 				if (cId in cbA) and callable(cbA[cId]):
-					logging.info('Listen.Callback')
+					logging.info('Callback')
 
 					cbA[cId](resJSON)
 					del cbA[cId]
@@ -63,7 +64,7 @@ class YiAPIListener(threading.Thread):
 				cbA= self.constantCB
 
 				if (cId in cbA) and callable(cbA[cId]):
-					logging.info('Listen.Callback static')
+					logging.info('Callback static')
 					cbA[cId](resJSON)
 
 

@@ -97,11 +97,10 @@ class YiAPI():
 
 		cbEvent.wait()
 		res= cbEvent.res 	#bound by generated cb, see blockingCB()
-		logging.info('Result= %s' % res)
+		logging.debug('Result %s' % res)
 
 		if res['rval']:
-			logging.warning('Camera error: %d' % res['rval'])
-			logging.debug('Full result: %s' % str(res))
+			logging.warning('Camera error %d' % res['rval'])
 			return res['rval']
 
 #		if callable(_command.resultCB):
@@ -118,7 +117,7 @@ class YiAPI():
 	def cmdSend(self, _command, _val=None):
 		out= _command.apply({'token':self.sessionId, 'heartbeat':self.tick}, _val)
 
-		logging.debug("Send: %s" % out)
+		logging.debug("Send %s" % out)
 		
 		self.sock.sendall( bytes(json.dumps(out),'ascii') )
 
