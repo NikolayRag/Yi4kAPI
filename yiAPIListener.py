@@ -9,20 +9,18 @@ is camera state, pushed periodically.
 '''
 
 class YiAPIListener(threading.Thread):
-	jsonTest= re.compile('Extra data: line \d+ column \d+ - line \d+ column \d+ \(char (?P<char>\d+) - \d+\)')
-
-	inputBuffer= ''
 	assignedCB= {}	#msgId:cb collection
 	constantCB= {}
 
+	jsonStream= None
 
 	def __init__(self, _sock):
 		threading.Thread.__init__(self)
 
 		self.sock= _sock
-		self.inputBuffer= ''
 		self.assignedCB= {}
 		self.constantCB= {}
+		self.jsonStream= JSONStream()
 
 		self.start()
 
@@ -40,14 +38,9 @@ class YiAPIListener(threading.Thread):
 				return
 
 			logging.debug("Part %db" % len(recv))
-			self.inputBuffer+= (recv.decode())
+			jsonA= self.jsonStream.find(recv.decode())
 
-
-			responseA, jsonDone= self.jsonRestore(self.inputBuffer)
-			self.inputBuffer= self.inputBuffer[jsonDone:]
-
-
-			for resJSON in responseA:
+			for resJSON in jsonA:
 				logging.info('Res %s' % str(resJSON))
 				if not 'msg_id' in resJSON:
 					logging.warning('Insufficient response, no msg_id')
@@ -86,9 +79,26 @@ class YiAPIListener(threading.Thread):
 
 
 
-#########
-#PRIVATE#
-#########
+class JSONStream():
+	jsonTest= re.compile('Extra data: line \d+ column \d+ - line \d+ column \d+ \(char (?P<char>\d+) - \d+\)')
+
+	jsonStr= ''
+
+
+	def __init__(self):
+		self.jsonStr= ''
+
+
+
+	def find(self, _in=''):
+		self.jsonStr+= _in
+		
+		jsonA, jsonDone= self.jsonRestore()
+
+		self.jsonStr= self.jsonStr[jsonDone:]
+
+		return jsonA
+
 
 
 	'''
@@ -96,25 +106,25 @@ class YiAPIListener(threading.Thread):
 
 	Return array of detected json found.
 	'''
-	def jsonRestore(self, _jsonStr):
+	def jsonRestore(self):
 		jsonDone= 0
-		responseA= []
+		jsonFound= []
 
 		while True:
 			#try full, then try part
 			try:
-				jsonTry= json.loads(_jsonStr[jsonDone:])
-				responseA.append(jsonTry)	#rest
+				jsonTry= json.loads(self.jsonStr[jsonDone:])
+				jsonFound.append(jsonTry)	#rest
 				
-				return responseA, len(_jsonStr)	#json ended up
+				return jsonFound, len(self.jsonStr)	#json ended up
 
 			except Exception as exc:
 				jsonErr= self.jsonTest.match(str(exc))
 				if not jsonErr:	#assumed unfinished json
-					return responseA, jsonDone
+					return jsonFound, jsonDone
 
 				jsonLen= int(jsonErr.group('char'))
-				responseA.append( json.loads(_jsonStr[jsonDone:jsonDone+jsonLen]) )
+				jsonFound.append( json.loads(self.jsonStr[jsonDone:jsonDone+jsonLen]) )
 
 				jsonDone+= jsonLen
 
