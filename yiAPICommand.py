@@ -75,6 +75,11 @@ import threading
 Runtime command class. Lives from command send to command response.
 '''
 class YiAPICommand():
+	cmdSend= None
+	resultCB= None
+	blockingCB= None
+	blockingEvent= None
+
 	res= None
 
 	def __init__(self, _cmdSend, _resultCB):
