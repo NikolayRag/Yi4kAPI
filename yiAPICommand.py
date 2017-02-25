@@ -23,7 +23,7 @@ class YiAPICommandGen():
 	values= None
 
 
-	def __init__(self, _id, _commandName='', values=None, params=None, variable=[], resultCB=None):
+	def __init__(self, _id, commandName='', values=None, params=None, variable=[], resultCB=None):
 		self.resultCB= resultCB
 
 		self.params= {'msg_id':int(_id)}
@@ -40,8 +40,8 @@ class YiAPICommandGen():
 			self.values= values
 
 
-		if _commandName:
-			self.commandName= _commandName
+		if commandName:
+			self.commandName= commandName
 			commands.append(self)
 
 
