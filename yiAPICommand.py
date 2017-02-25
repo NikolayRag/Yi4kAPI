@@ -18,9 +18,9 @@ class YiAPICommandGen():
 
 	commandName= ''
 	params= None
-	variable= None
 
-	values= None
+	variable= None
+	values= None	#available values list to assign to .variable. Logging use only.
 
 
 	def __init__(self, _id, commandName='', values=None, params=None, variable=[], resultCB=None):
@@ -47,13 +47,13 @@ class YiAPICommandGen():
 
 
 	'''
-	Collect dict to be send to camera.
+	Create object representing command at runtime.
 	Append stored params to provided dict and apply _val to stored .variable respectively
 
-	Return complete suitable dict.
+	Return YiAPICommand.
 	'''
-	def apply(self, _dict, _val=None):
-		_dict.update(self.params)
+	def apply(self, _cmdPrep, _val=None):
+		_cmdPrep.update(self.params)
 
 
 		#assign provided _val[] values to stored .variable[] parameters
@@ -61,8 +61,17 @@ class YiAPICommandGen():
 			_val= [_val]
 
 		for pair in zip(self.variable,_val):
-			_dict[pair[0]]= pair[1]
+			_cmdPrep[pair[0]]= pair[1]
 
 
-		return _dict
+		return YiAPICommand(_cmdPrep, self.resultCB)
 
+
+
+'''
+Runtime command class. Lives from command send to command response.
+'''
+class YiAPICommand():
+	def __init__(self, _cmdSend, _resultCB):
+		self.cmdSend= _cmdSend
+		self.resultCB= _resultCB

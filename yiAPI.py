@@ -81,14 +81,17 @@ class YiAPI():
 			return -99999
 
 
+
+		runCmd= _command.apply({'token':self.sessionId, 'heartbeat':self.tick}, _val)
+
+
 		cbEvent= None
 		if not cb:
 			cb, cbEvent= self.blockingCB()
 
-		self.listener.assign(_command.params['msg_id'], cb)
+		self.listener.assign(runCmd.cmdSend['msg_id'], cb)
 		
-		self.cmdSend(_command, _val)
-		self.tick+= 1
+		self.cmdSend(runCmd.cmdSend)
 
 		if not cbEvent:	#external callback supplied, exit at once
 			return
@@ -103,8 +106,8 @@ class YiAPI():
 			logging.warning('Camera error %d' % res['rval'])
 			return res['rval']
 
-#		if callable(_command.resultCB):
-#			return _command.resultCB(res)
+#		if callable(runCmd.resultCB):
+#			return runCmd.resultCB(res)
 
 		if 'param' in res:
 			return res['param']
@@ -112,14 +115,14 @@ class YiAPI():
 
 
 	'''
-	Sent _command co camera.
+	Sent YiAPICommandGen co camera.
 	'''
-	def cmdSend(self, _command, _val=None):
-		out= _command.apply({'token':self.sessionId, 'heartbeat':self.tick}, _val)
-
-		logging.debug("Send %s" % out)
+	def cmdSend(self, _cmdDict):
+		logging.debug("Send %s" % _cmdDict)
 		
-		self.sock.sendall( bytes(json.dumps(out),'ascii') )
+		self.sock.sendall( bytes(json.dumps(_cmdDict),'ascii') )
+
+		self.tick+= 1
 
 
 
