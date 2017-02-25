@@ -1,3 +1,6 @@
+import logging
+
+
 '''
 Public available commands.
 '''
@@ -80,7 +83,7 @@ class YiAPICommand():
 	blockingCB= None
 	blockingEvent= None
 
-	res= None
+	resultDict= None
 
 	def __init__(self, _cmdSend, _resultCB):
 		self.cmdSend= _cmdSend
@@ -88,6 +91,18 @@ class YiAPICommand():
 
 		self.blockingCB, self.blockingEvent = self.blockingCBGen()
 
+
+
+	def result(self):
+		if self.resultDict['rval']:
+			logging.warning('Camera error %d' % self.resultDict['rval'])
+			return self.resultDict['rval']
+
+		if callable(self.resultCB):
+			return self.resultCB(self.resultDict)
+
+		if 'param' in self.resultDict:
+			return self.resultDict['param']
 
 
 	'''
@@ -98,7 +113,7 @@ class YiAPICommand():
 		cbEvent= threading.Event()
 		
 		def func(_res):
-			self.res= _res
+			self.resultDict= _res
 			cbEvent.set()
 
 		return (func, cbEvent)

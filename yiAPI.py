@@ -88,24 +88,10 @@ class YiAPI():
 		
 		self.cmdSend(runCmd.cmdSend)
 
-#		if not cbEvent:	#external callback supplied, exit at once
-#			return
-
-		#blocked branch from here
-
 		runCmd.blockingEvent.wait()
-		res= runCmd.res
-		logging.debug('Result %s' % res)
+		logging.debug('Result %s' % runCmd.resultDict)
 
-		if res['rval']:
-			logging.warning('Camera error %d' % res['rval'])
-			return res['rval']
-
-#		if callable(runCmd.resultCB):
-#			return runCmd.resultCB(res)
-
-		if 'param' in res:
-			return res['param']
+		return runCmd.result()
 
 
 
