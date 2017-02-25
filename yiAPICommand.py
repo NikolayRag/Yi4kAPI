@@ -86,7 +86,7 @@ class YiAPICommand():
 		self.cmdSend= _cmdSend
 		self.resultCB= _resultCB
 
-		self.blockingCB, self.blockingEvent = self.blockingGen()
+		self.blockingCB, self.blockingEvent = self.blockingCBGen()
 
 
 
@@ -94,7 +94,7 @@ class YiAPICommand():
 	Generate callback suitable for supplying to YiAPIListener.assing()
 	and Event fired at callback call.
 	'''
-	def blockingGen(self):
+	def blockingCBGen(self):
 		cbEvent= threading.Event()
 		
 		def func(_res):
