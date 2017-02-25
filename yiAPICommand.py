@@ -68,10 +68,33 @@ class YiAPICommandGen():
 
 
 
+
+import threading
+
 '''
 Runtime command class. Lives from command send to command response.
 '''
 class YiAPICommand():
+	res= None
+
 	def __init__(self, _cmdSend, _resultCB):
 		self.cmdSend= _cmdSend
 		self.resultCB= _resultCB
+
+		self.blockingCB, self.blockingEvent = self.blockingGen()
+
+
+
+	'''
+	Generate callback suitable for supplying to YiAPIListener.assing()
+	and Event fired at callback call.
+	'''
+	def blockingGen(self):
+		cbEvent= threading.Event()
+		
+		def func(_res):
+			self.res= _res
+			cbEvent.set()
+
+		return (func, cbEvent)
+

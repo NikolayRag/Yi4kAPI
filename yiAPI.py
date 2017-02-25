@@ -1,6 +1,6 @@
 import logging
 
-import socket, json, threading
+import socket, json
 
 from .yiAPICommand import *
 from .yiAPIListener import *
@@ -84,22 +84,17 @@ class YiAPI():
 
 		runCmd= _command.apply({'token':self.sessionId, 'heartbeat':self.tick}, _val)
 
-
-		cbEvent= None
-		if not cb:
-			cb, cbEvent= self.blockingCB()
-
-		self.listener.assign(runCmd.cmdSend['msg_id'], cb)
+		self.listener.assign(runCmd.cmdSend['msg_id'], runCmd.blockingCB)
 		
 		self.cmdSend(runCmd.cmdSend)
 
-		if not cbEvent:	#external callback supplied, exit at once
-			return
+#		if not cbEvent:	#external callback supplied, exit at once
+#			return
 
 		#blocked branch from here
 
-		cbEvent.wait()
-		res= cbEvent.res 	#bound by generated cb, see blockingCB()
+		runCmd.blockingEvent.wait()
+		res= runCmd.res
 		logging.debug('Result %s' % res)
 
 		if res['rval']:
@@ -123,20 +118,3 @@ class YiAPI():
 		self.sock.sendall( bytes(json.dumps(_cmdDict),'ascii') )
 
 		self.tick+= 1
-
-
-
-	'''
-	Generate callback suitable for supplying to YiAPIListener.assing()
-	and Event fired at callback call.
-	'''
-	def blockingCB(self):
-		cbEvent= threading.Event()
-		cbEvent.res= False
-		
-		def func(_res):
-			cbEvent.res= _res
-			cbEvent.set()
-
-		return (func, cbEvent)
-
