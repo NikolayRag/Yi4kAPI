@@ -51,15 +51,17 @@ class YiAPIListener(threading.Thread):
 				cId= resJSON['msg_id']
 				cbA= self.assignedCB
 
+				#command-assigned cb's
 				if (cId in cbA) and callable(cbA[cId]):
 					logging.info('Callback')
 
 					cbA[cId](resJSON)
-					del cbA[cId]
+					del cbA[cId]	#clean CB out
 
 
 				cbA= self.constantCB
 
+				#Static cb's
 				if (cId in cbA) and callable(cbA[cId]):
 					logging.info('Callback static')
 					cbA[cId](resJSON)
@@ -69,7 +71,7 @@ class YiAPIListener(threading.Thread):
 	'''
 	Assign callback for awaited command responce.
 	'''
-	def assign(self, _msgId, _cb):
+	def instantCB(self, _msgId, _cb):
 		self.assignedCB[_msgId]= _cb
 
 

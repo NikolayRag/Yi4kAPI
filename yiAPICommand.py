@@ -9,6 +9,7 @@ commands= []
 
 '''
 Class usable to pass to YiAPI.cmd()
+.makeCmd() is called then to generate runtime command object.
 
 	params
 		dict of non-changing parameters.
@@ -55,7 +56,7 @@ class YiAPICommandGen():
 
 	Return YiAPICommand.
 	'''
-	def apply(self, _cmdPrep, _val=None):
+	def makeCmd(self, _cmdPrep, _val=None):
 		_cmdPrep.update(self.params)
 
 

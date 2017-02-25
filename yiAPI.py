@@ -75,16 +75,15 @@ class YiAPI():
 	Run predefined _command.
 	if _vals provided, it's a value assigned to YiAPICommand.values respectively. 
 	'''
-	def cmd(self, _command, _val=None, cb=None):
+	def cmd(self, _command, _val=None):
 		if not self.sock:
 			logging.error('Camera disconnected')
 			return -99999
 
 
+		runCmd= _command.makeCmd({'token':self.sessionId, 'heartbeat':self.tick}, _val)
 
-		runCmd= _command.apply({'token':self.sessionId, 'heartbeat':self.tick}, _val)
-
-		self.listener.assign(runCmd.cmdSend['msg_id'], runCmd.blockingCB)
+		self.listener.instantCB(runCmd.cmdSend['msg_id'], runCmd.blockingCB)
 		
 		self.cmdSend(runCmd.cmdSend)
 
