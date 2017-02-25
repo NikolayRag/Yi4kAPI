@@ -13,7 +13,7 @@ Class usable to pass to YiAPI.cmd()
 	variable
 		name or list of names to be assigned later with apply()
 '''
-class YiAPICommand():
+class YiAPICommandGen():
 	resultCB= None
 
 	commandName= ''

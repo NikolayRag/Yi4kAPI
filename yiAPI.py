@@ -14,8 +14,8 @@ from .yiAPIListener import *
 
 class YiAPI():
 	#private commands
-	startSession= YiAPICommand(257)
-	stopSession= YiAPICommand(258)
+	startSession= YiAPICommandGen(257)
+	stopSession= YiAPICommandGen(258)
 
 
 	ip= '192.168.42.1'
