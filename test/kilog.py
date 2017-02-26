@@ -2,11 +2,20 @@
 Modify logging output by adding class name
 '''
 import logging, inspect
-logging.basicConfig(level= logging.DEBUG, format= '%(name)s %(levelname)s: %(message)s')
 
-def kiLog(_name, _level, _fn, _ln, _msg, _args, _exInfo, _func, _stack):
+
+DEBUG= logging.DEBUG
+INFO= logging.INFO
+WARNING= logging.WARNING
+ERROR= logging.ERROR
+CRITICAL= logging.CRITICAL
+
+
+namesAllowed= {}
+
+def hook(_name, _level, _fn, _ln, _msg, _args, _exInfo, _func, _stack):
 	stack= inspect.stack()
-	callObj= stack[5][0].f_locals
+	callObj= stack[5][0].f_locals #skip stack to first 'outer' level
 	_name= (
 		('self' in callObj)
 	 	and hasattr(callObj['self'],'__class__')
@@ -14,6 +23,27 @@ def kiLog(_name, _level, _fn, _ln, _msg, _args, _exInfo, _func, _stack):
 	 	or ''
  	)
 
+	if len(namesAllowed):
+		if not (_name in namesAllowed):
+			_level= -1
+
 	return logging.LogRecord(_name, _level, _fn, _ln, _msg, _args, _exInfo)
 
-logging.setLogRecordFactory(kiLog)
+logging.setLogRecordFactory(hook)
+
+
+
+def setNames(_names, _state=True):
+	for name in _names:
+		if _state:
+			namesAllowed[name]= True
+			continue
+
+		if name in namesAllowed:
+			del namesAllowed[name]
+			
+
+def config(level= logging.WARNING):
+	logging.basicConfig(level= level, format= '%(name)s %(levelname)s: %(message)s')
+
+config(logging.DEBUG)
