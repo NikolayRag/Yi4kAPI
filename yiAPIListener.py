@@ -19,7 +19,21 @@ class YiAPIListener(threading.Thread):
 
 		self.sock= _sock
 		self.commandsCB= []
-		self.constantCB= {}
+		self.constantCB= {
+			"start_video_record": None,
+			"video_record_complete": None,
+			"start_photo_capture": None,
+			"photo_taken": None,
+			"vf_start": None,
+			"vf_stop": None,
+			"battery": None,
+			"battery_status": None,
+			"adapter": None,
+			"adapter_status": None,
+			"sdcard_format_done": None,
+			"setting_changed": None
+		}
+
 		self.jsonStream= JSONStream()
 
 		self.start()
@@ -50,7 +64,30 @@ class YiAPIListener(threading.Thread):
 
 				self.commandsCB= self.applyCB(self.commandsCB, resJSON)
 
-				self.applyCB(self.constantCB, resJSON)
+				if resJSON['msg_id']==7:
+					for cCb in self.constantCB:
+						if self.constantCB[cCb] and resJSON['type']==cCb:
+							logging.info('Callback static')
+							self.constantCB[cCb](resJSON)
+
+
+
+	'''
+	Assign Yi response callback.
+	'''
+	def setCB(self, _type=None, _cb=None):
+		if not _type:
+			return self.constantCB.copy()
+
+		if _type not in self.constantCB:
+			return
+
+		if callable(_cb):
+			self.constantCB[_type]= _cb
+		else:
+			self.constantCB[_type]= None
+
+		return True
 
 
 

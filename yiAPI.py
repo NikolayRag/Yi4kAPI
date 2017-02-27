@@ -102,3 +102,10 @@ class YiAPI():
 		self.sock.sendall( bytes(json.dumps(_cmdDict),'ascii') )
 
 		self.tick+= 1
+
+
+	def setCB(self, _type=None, _cb=None):
+		if not self.listener:
+			return
+
+		return self.listener.setCB(_type, _cb)
