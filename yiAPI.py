@@ -24,6 +24,7 @@ class YiAPI():
 	sessionId= 0
 
 	commandTimeout= 10
+	connectionTimeout= 5
 
 	listener= None
 
@@ -41,7 +42,7 @@ class YiAPI():
 			self.ip= _ip
 
 		#sometimes camera couldnt be connected after a pause. Try to connect several times.
-		for i in range(0,10):
+		for i in range(0,int(self.connectionTimeout/.5)):
 			try:
 				self.sock= socket.create_connection((self.ip,7878),.5)
 				break
