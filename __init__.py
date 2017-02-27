@@ -38,10 +38,13 @@ Define public commands
 '''
 
 startRecording=		YiAPICommandGen(513, 'startRecording')
-stopRecording=		YiAPICommandGen(514, 'stopRecording')
+stopRecording=		YiAPICommandGen(514, 'stopRecording',
+	resultReq= {'msg_id': 7, 'type': 'video_record_complete'}
+)
 
 capturePhoto=		YiAPICommandGen(16777220, 'capturePhoto',
-	params= {'param':'precise quality;off'}
+	params= {'param':'precise quality;off'},
+	resultReq= {'msg_id': 7, 'type': 'photo_taken'}
 )
 
 getFileList=		YiAPICommandGen(1282, 'getFileList',

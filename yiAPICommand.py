@@ -18,6 +18,7 @@ Class usable to pass to YiAPI.cmd()
 		name or list of names to be assigned later with apply()
 '''
 class YiAPICommandGen():
+	resultReq= None
 	resultCB= None
 
 	commandName= ''
@@ -27,7 +28,16 @@ class YiAPICommandGen():
 	values= None	#available values list to assign to .variable. Logging use only.
 
 
-	def __init__(self, _id, commandName='', values=None, params=None, variable=[], resultCB=None):
+	def __init__(self,
+		_id,
+		commandName='',
+		values=None,
+		params=None,
+		variable=[],
+		resultReq=None,
+		resultCB=None
+	):
+		self.resultReq= resultReq
 		self.resultCB= resultCB
 
 		self.params= {'msg_id':int(_id)}
@@ -68,7 +78,20 @@ class YiAPICommandGen():
 			_cmdPrep[pair[0]]= pair[1]
 
 
-		return YiAPICommand(_cmdPrep, self.resultCB)
+		return YiAPICommand(_cmdPrep, self.resultReq, self.resultCB)
+
+
+
+	'''
+	return response templates required for command to finish
+	'''
+	def cbTemplates(self):
+		defaultTmpl= [{'msg_id': self.params['msg_id']}]
+
+		if self.resultReq:
+			defaultTmpl.append(self.resultReq)
+
+		return defaultTmpl
 
 
 
@@ -80,15 +103,22 @@ Runtime command class. Lives from command send to command response.
 '''
 class YiAPICommand():
 	cmdSend= None
+	resultReq= None
 	resultCB= None
+	blockingCnt= 1
 	blockingCB= None
 	blockingEvent= None
 
 	resultDict= None
 
-	def __init__(self, _cmdSend, _resultCB):
+	def __init__(self, _cmdSend, _resultReq, _resultCB):
 		self.cmdSend= _cmdSend
+		self.resultDict= {}
+		self.resultReq= _resultReq
 		self.resultCB= _resultCB
+
+		if _resultReq:
+			self.blockingCnt= 2
 
 		self.blockingCB, self.blockingEvent = self.blockingCBGen()
 
@@ -114,10 +144,16 @@ class YiAPICommand():
 		cbEvent= threading.Event()
 		
 		def func(_res):
-			self.resultDict= _res
-			cbEvent.set()
+			self.resultDict.update(_res)
 
-			return True
+
+			self.blockingCnt-= 1
+			if ('rval' in _res) and (_res['rval']):
+				self.blockingCnt= 0
+
+			if not self.blockingCnt:
+				cbEvent.set()
+				return True
 
 		return (func, cbEvent)
 
