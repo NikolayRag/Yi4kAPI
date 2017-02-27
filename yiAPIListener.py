@@ -57,8 +57,8 @@ class YiAPIListener(threading.Thread):
 	'''
 	Assign one-time callback for awaited command responce.
 	'''
-	def instantCB(self, _template, _cb):
-		self.assignedCBA.append({'template':_template, 'cb':_cb})
+	def instantCB(self, _command):
+		self.assignedCBA.append(_command)
 
 
 
@@ -70,20 +70,15 @@ class YiAPIListener(threading.Thread):
 	def applyCB(self, _assignedCBA, _res):
 		unusedCBA= []
 
-		for cCB in _assignedCBA:
-			callbackMatch= True
-			for cField in cCB['template']:
-				if (cField not in _res) or (cCB['template'][cField]!=_res[cField]):
-					callbackMatch= False
-
+		for cCommand in _assignedCBA:
 			wipeCB= False
-			if callbackMatch:
-				if callable(cCB['cb']):
+			if cCommand.cbMatch(_res):
+				if callable(cCommand.blockingCB):
 					logging.info('Callback')
-					wipeCB= cCB['cb'](_res)
+					wipeCB= cCommand.blockingCB(_res)
 			
 			if not wipeCB:
-				unusedCBA.append(cCB)
+				unusedCBA.append(cCommand)
 
 		return unusedCBA
 

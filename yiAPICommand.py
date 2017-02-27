@@ -82,16 +82,6 @@ class YiAPICommandGen():
 
 
 
-	'''
-	return response templates required for command to finish
-	'''
-	def cbTemplates(self):
-		defaultTmpl= [{'msg_id': self.params['msg_id']}]
-
-		if self.resultReq:
-			defaultTmpl.append(self.resultReq)
-
-		return defaultTmpl
 
 
 
@@ -157,3 +147,21 @@ class YiAPICommand():
 
 		return (func, cbEvent)
 
+
+	'''
+	Check if Yi response matches command callback conditions
+	'''
+	def cbMatch(self, _res):
+		matchTmpl= [{'msg_id': self.cmdSend['msg_id']}]
+		if self.resultReq:
+			matchTmpl.append(self.resultReq)
+
+
+		for cMatch in matchTmpl:
+			isMatch= True
+			for cField in cMatch:
+				if (cField not in _res) or (cMatch[cField]!=_res[cField]):
+					isMatch= False
+
+			if isMatch:
+				return True
