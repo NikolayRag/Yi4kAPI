@@ -9,7 +9,7 @@ is camera state, pushed periodically.
 '''
 
 class YiAPIListener(threading.Thread):
-	assignedCBA= []	#(template, cb) collection
+	commandsCB= []	#runtime commands listening
 	constantCB= {}
 
 	jsonStream= None
@@ -18,7 +18,7 @@ class YiAPIListener(threading.Thread):
 		threading.Thread.__init__(self)
 
 		self.sock= _sock
-		self.assignedCBA= []
+		self.commandsCB= []
 		self.constantCB= {}
 		self.jsonStream= JSONStream()
 
@@ -48,7 +48,7 @@ class YiAPIListener(threading.Thread):
 					continue
 
 
-				self.assignedCBA= self.applyCB(self.assignedCBA, resJSON)
+				self.commandsCB= self.applyCB(self.commandsCB, resJSON)
 
 				self.applyCB(self.constantCB, resJSON)
 
@@ -58,7 +58,7 @@ class YiAPIListener(threading.Thread):
 	Assign one-time callback for awaited command responce.
 	'''
 	def instantCB(self, _command):
-		self.assignedCBA.append(_command)
+		self.commandsCB.append(_command)
 
 
 
@@ -67,10 +67,10 @@ class YiAPIListener(threading.Thread):
 	Rolling over assigned callbacks, call them if all of template values exists in response.
 	Then wipe callback out.
 	'''
-	def applyCB(self, _assignedCBA, _res):
+	def applyCB(self, _commandsA, _res):
 		unusedCBA= []
 
-		for cCommand in _assignedCBA:
+		for cCommand in _commandsA:
 			wipeCB= False
 			if cCommand.cbMatch(_res):
 				if callable(cCommand.blockingCB):
