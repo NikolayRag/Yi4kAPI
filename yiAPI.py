@@ -1,6 +1,6 @@
 import logging
 
-import socket, json
+import socket, json, threading
 
 from .yiAPICommand import *
 from .yiAPIListener import *
@@ -22,6 +22,8 @@ class YiAPI():
 	sock= None
 	tick= 0
 	sessionId= 0
+
+	commandTimeout= 10
 
 	listener= None
 
@@ -84,6 +86,7 @@ class YiAPI():
 		runCmd= _command.makeCmd({'token':self.sessionId, 'heartbeat':self.tick}, _val)
 		self.listener.instantCB(runCmd)
 		
+		threading.Timer(self.commandTimeout, runCmd.blockingEvent.set())
 		self.cmdSend(runCmd.cmdSend)
 
 		runCmd.blockingEvent.wait()

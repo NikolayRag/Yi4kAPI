@@ -115,6 +115,10 @@ class YiAPICommand():
 
 
 	def result(self):
+		if not 'rval' in self.resultDict:
+			logging.error('Camera timeout')
+			return -99998
+
 		if self.resultDict['rval']:
 			logging.warning('Camera error %d' % self.resultDict['rval'])
 			return self.resultDict['rval']
