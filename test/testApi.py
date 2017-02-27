@@ -1,6 +1,9 @@
 import kilog
 kilog.names(('',))
 
+'''
+Bunch of Yi commands to test.
+'''
 
 
 import sys, os
@@ -12,103 +15,113 @@ from Yi4kAPI import *
 
 import time
 
+
+def vid_ok(_res):
+	print('Video recorded:', _res['param'], _res['msize'], 'bytes')
+
+def set_ok(_res):
+	print('Setting changed')
+
 a= YiAPI()
-logging.info('Started: %s' % str(bool(a)))
+a.setCB('video_record_complete', vid_ok)
+a.setCB('setting_changed', set_ok)
+
+print('Started: %s' % str(bool(a)))
 res= a.cmd(getSettings)
-logging.info('getSettings: %s' % str(res))
+print('getSettings: %s' % str(res))
 res= a.cmd(stopRecording)
-logging.info('(err:stopped) stopRecording: %s' % str(res))
-time.sleep(4)
-logging.info('=============')
+print('(err:stopped) stopRecording: %s' % str(res))
+time.sleep(40)
+print('=============Paused to test manual recording tart/stop and shange settings')
 print('')
 
 
 resEv= a.cmd(getVideoExposureValue)
-logging.info('getVideoExposureValue: %s' % str(resEv))
+print('getVideoExposureValue: %s' % str(resEv))
 res= a.cmd(setVideoExposureValue, '+1.5')
-logging.info('setVideoExposureValue: %s' % str(res))
+print('setVideoExposureValue: %s' % str(res))
 res= a.cmd(startRecording)
-logging.info('startRecording: %s' % str(res))
+print('startRecording: %s' % str(res))
 
 time.sleep(4)
-logging.info('Video')
+print('Video')
 
 res= a.cmd(stopRecording)
-logging.info('stopRecording: %s' % str(res))
+print('stopRecording: %s' % str(res))
 res= a.cmd(setVideoExposureValue, resEv)
-logging.info('setVideoExposureValue: %s' % str(res))
+print('setVideoExposureValue: %s' % str(res))
 time.sleep(4)
-logging.info('=============')
+print('=============')
 print('')
 
 res= a.cmd(capturePhoto)
-logging.info('(err:mode) capturePhoto: %s' % str(res))
+print('(err:mode) capturePhoto: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+print('capturePhoto: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+print('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('=============')
+print('=============')
 print('')
 
 #+
 res= a.cmd(getFileList)
-logging.info('getFileList: %s' % str(res))
+print('getFileList: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+print('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('=============')
+print('=============')
 print('')
 
 #+
 res= a.cmd(startViewFinder)
-logging.info('startViewFinder: %s' % str(res))
+print('startViewFinder: %s' % str(res))
 res= a.cmd(stopViewFinder)
-logging.info('stopViewFinder: %s' % str(res))
+print('stopViewFinder: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+print('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('=============')
+print('=============')
 print('')
 
 #+
 res= a.cmd(setDateTime, '2017-02-24 00:25:01')
-logging.info('setDateTime: %s' % str(res))
+print('setDateTime: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+print('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('=============')
+print('=============')
 print('')
 
 #+
 res= a.cmd(setSystemMode, "record")
-logging.info('setSystemMode: %s' % str(res))
+print('setSystemMode: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+print('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('=============')
+print('=============')
 print('')
 
 res= a.cmd(setRecordMode, "record")
-logging.info('setRecordMode: %s' % str(res))
+print('setRecordMode: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('(err:mode) capturePhoto: %s' % str(res))
+print('(err:mode) capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('=============')
+print('=============')
 print('')
 
 res= a.cmd(setRecordMode, "record")
-logging.info('setRecordMode: %s' % str(res))
+print('setRecordMode: %s' % str(res))
 res= a.cmd(setCaptureMode, "precise quality")
-logging.info('setCaptureMode: %s' % str(res))
+print('setCaptureMode: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+print('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('=============')
+print('=============')
 print('')
 
 res= a.cmd(setRecordMode, "record_loop")
-logging.info('setRecordMode: %s' % str(res))
+print('setRecordMode: %s' % str(res))
 
 res= a.close()
-logging.info('Stop state: %s' % str(res))
+print('Stop state: %s' % str(res))
