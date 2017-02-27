@@ -1,5 +1,5 @@
 import kilog
-kilog.setNames(('YiAPI',''))
+kilog.names(('',))
 
 
 
@@ -16,8 +16,10 @@ a= YiAPI()
 logging.info('Started: %s' % str(bool(a)))
 res= a.cmd(getSettings)
 logging.info('getSettings: %s' % str(res))
+res= a.cmd(stopRecording)
+logging.info('(err:stopped) stopRecording: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 
@@ -33,20 +35,20 @@ logging.info('Video')
 
 res= a.cmd(stopRecording)
 logging.info('stopRecording: %s' % str(res))
-res= a.cmd(setVideoExposureValue, '+1.0')
+res= a.cmd(setVideoExposureValue, resEv)
 logging.info('setVideoExposureValue: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+logging.info('(err:mode) capturePhoto: %s' % str(res))
 res= a.cmd(capturePhoto)
 logging.info('capturePhoto: %s' % str(res))
 res= a.cmd(capturePhoto)
 logging.info('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 #+
@@ -55,7 +57,7 @@ logging.info('getFileList: %s' % str(res))
 res= a.cmd(capturePhoto)
 logging.info('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 #+
@@ -66,7 +68,7 @@ logging.info('stopViewFinder: %s' % str(res))
 res= a.cmd(capturePhoto)
 logging.info('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 #+
@@ -75,7 +77,7 @@ logging.info('setDateTime: %s' % str(res))
 res= a.cmd(capturePhoto)
 logging.info('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 #+
@@ -84,15 +86,15 @@ logging.info('setSystemMode: %s' % str(res))
 res= a.cmd(capturePhoto)
 logging.info('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 res= a.cmd(setRecordMode, "record")
 logging.info('setRecordMode: %s' % str(res))
 res= a.cmd(capturePhoto)
-logging.info('capturePhoto: %s' % str(res))
+logging.info('(err:mode) capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 res= a.cmd(setRecordMode, "record")
@@ -102,7 +104,7 @@ logging.info('setCaptureMode: %s' % str(res))
 res= a.cmd(capturePhoto)
 logging.info('capturePhoto: %s' % str(res))
 time.sleep(4)
-logging.info('')
+logging.info('=============')
 print('')
 
 res= a.cmd(setRecordMode, "record_loop")

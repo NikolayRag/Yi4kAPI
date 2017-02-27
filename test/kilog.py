@@ -33,7 +33,7 @@ logging.setLogRecordFactory(hook)
 
 
 
-def setNames(_names, _state=True):
+def names(_names, _state=True):
 	for name in _names:
 		if _state:
 			namesAllowed[name]= True
@@ -43,7 +43,7 @@ def setNames(_names, _state=True):
 			del namesAllowed[name]
 			
 
-def config(level= logging.WARNING):
+def config(level= WARNING):
 	logging.basicConfig(level= level, format= '%(name)s %(levelname)s: %(message)s')
 
-config(logging.DEBUG)
+config(DEBUG)
