@@ -83,7 +83,7 @@ class YiAPI():
 
 		runCmd= _command.makeCmd({'token':self.sessionId, 'heartbeat':self.tick}, _val)
 
-		self.listener.instantCB(runCmd.cmdSend['msg_id'], runCmd.blockingCB)
+		self.listener.instantCB({'msg_id': runCmd.cmdSend['msg_id']}, runCmd.blockingCB)
 		
 		self.cmdSend(runCmd.cmdSend)
 

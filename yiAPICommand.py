@@ -117,5 +117,7 @@ class YiAPICommand():
 			self.resultDict= _res
 			cbEvent.set()
 
+			return True
+
 		return (func, cbEvent)
 

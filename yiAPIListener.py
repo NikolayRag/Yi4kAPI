@@ -9,7 +9,7 @@ is camera state, pushed periodically.
 '''
 
 class YiAPIListener(threading.Thread):
-	assignedCB= {}	#msgId:cb collection
+	assignedCBA= []	#(template, cb) collection
 	constantCB= {}
 
 	jsonStream= None
@@ -18,7 +18,7 @@ class YiAPIListener(threading.Thread):
 		threading.Thread.__init__(self)
 
 		self.sock= _sock
-		self.assignedCB= {}
+		self.assignedCBA= []
 		self.constantCB= {}
 		self.jsonStream= JSONStream()
 
@@ -48,34 +48,44 @@ class YiAPIListener(threading.Thread):
 					continue
 
 
-				cId= resJSON['msg_id']
-				cbA= self.assignedCB
+				self.assignedCBA= self.applyCB(self.assignedCBA, resJSON)
 
-				#command-assigned cb's
-				if (cId in cbA) and callable(cbA[cId]):
+				self.applyCB(self.constantCB, resJSON)
+
+
+
+	'''
+	Assign one-time callback for awaited command responce.
+	'''
+	def instantCB(self, _template, _cb):
+		self.assignedCBA.append({'template':_template, 'cb':_cb})
+
+
+
+
+	'''
+	Rolling over assigned callbacks, call them if all of template values exists in response.
+	Then wipe callback out.
+	'''
+	def applyCB(self, _assignedCBA, _res):
+		unusedCBA= []
+
+		for cCB in _assignedCBA:
+			callbackMatch= True
+			for cField in cCB['template']:
+				if (cField not in _res) or (cCB['template'][cField]!=_res[cField]):
+					callbackMatch= False
+
+			wipeCB= False
+			if callbackMatch:
+				if callable(cCB['cb']):
 					logging.info('Callback')
+					wipeCB= cCB['cb'](_res)
+			
+			if not wipeCB:
+				unusedCBA.append(cCB)
 
-					cbA[cId](resJSON)
-					del cbA[cId]	#clean CB out
-
-
-				cbA= self.constantCB
-
-				#Static cb's
-				if (cId in cbA) and callable(cbA[cId]):
-					logging.info('Callback static')
-					cbA[cId](resJSON)
-
-
-
-	'''
-	Assign callback for awaited command responce.
-	'''
-	def instantCB(self, _msgId, _cb):
-		self.assignedCB[_msgId]= _cb
-
-
-
+		return unusedCBA
 
 
 
