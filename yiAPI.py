@@ -88,7 +88,7 @@ class YiAPI():
 		runCmd= _command.makeCmd({'token':self.sessionId, 'heartbeat':self.tick}, _val)
 		self.listener.instantCB(runCmd)
 		
-		threading.Timer(self.commandTimeout, runCmd.blockingEvent.set())
+		threading.Timer(self.commandTimeout, runCmd.blockingEvent.set).start()
 		self.cmdSend(runCmd.cmdSend)
 
 		runCmd.blockingEvent.wait()

@@ -18,6 +18,7 @@ import time
 
 def vid_ok(_res):
 	print('Video recorded:', _res['param'], _res['msize'], 'bytes')
+	print(_res)
 
 def set_ok(_res):
 	print('Setting changed')
