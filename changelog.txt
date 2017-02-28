@@ -1,0 +1,17 @@
+v1.1
+	More flexible communicating, tho still blocking.
+
+	add:
+		- 'stopRecording' and 'capturePhoto' waits for actual end of execution, returning file name.
+		- YiAPI.setCB(name, callback) for background callbacks.
+		- 'adapter', 'adapter_status' and 'battery_status' callbacks in addition to original ones.
+
+v1.0
+	Basic Yi4k API functionality.
+	
+	add:
+		- Most of commands to communicate with camera.
+
+	limits:
+		- communication are blocking.
+		- values provided to commands should be correct strings, which list is stored at YiAPICommandGen.values
