@@ -1,10 +1,13 @@
-v1.1
+v1.2
 	More flexible communicating, tho still blocking.
 
 	add:
 		- 'stopRecording' and 'capturePhoto' waits for actual end of execution, returning file name.
 		- YiAPI.setCB(name, callback) for background callbacks.
 		- 'adapter', 'adapter_status' and 'battery_status' callbacks in addition to original ones.
+
+v1.1
+	Bugfix
 
 v1.0
 	Basic Yi4k API functionality.
