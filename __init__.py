@@ -54,12 +54,8 @@ getFileList=		YiAPICommandGen(1282, 'getFileList',
 
 #deleteFile=		YiAPICommandGen(1281, 'deleteFile', {}, {'param': '/tmp/fuse_d/DCIM'}, resultCB= lambda res: res['listing'])
 
-startViewFinder=		YiAPICommandGen(259, 'startViewFinder',
-	resultReq= {'msg_id': 7, 'type': 'vf_start'}
-)
-stopViewFinder=		YiAPICommandGen(260, 'stopViewFinder',
-	resultReq= {'msg_id': 7, 'type': 'vf_stop'}
-)
+startViewFinder=		YiAPICommandGen(259, 'startViewFinder')
+stopViewFinder=		YiAPICommandGen(260, 'stopViewFinder')
 
 
 getSettings=		YiAPICommandGen(3,	'getSettings',
