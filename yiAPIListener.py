@@ -26,6 +26,8 @@ class YiAPIListener(threading.Thread):
 			"photo_taken": None,
 			"vf_start": None,
 			"vf_stop": None,
+			"enter_album": None,
+			"exit_album": None,
 			"battery": None,
 			"battery_status": None,
 			"adapter": None,
