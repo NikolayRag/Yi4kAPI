@@ -91,7 +91,11 @@ class YiAPI():
 		timeoutCmd= threading.Timer(self.commandTimeout, runCmd.blockingEvent.set)
 		timeoutCmd.start()
 
-		self.cmdSend(runCmd.cmdSend)                                	
+		if not self.cmdSend(runCmd.cmdSend):
+			logging.critical('Socket error while sending')
+
+			runCmd.blockingEvent.set()
+			self.sock= None
 
 		runCmd.blockingEvent.wait()
 		timeoutCmd.cancel()
@@ -108,9 +112,14 @@ class YiAPI():
 	def cmdSend(self, _cmdDict):
 		logging.debug("Send %s" % _cmdDict)
 		
-		self.sock.sendall( bytes(json.dumps(_cmdDict),'ascii') )
+		try:
+			self.sock.sendall( bytes(json.dumps(_cmdDict),'ascii') )
+		except:
+			return
 
 		self.tick+= 1
+		return True
+
 
 
 	def setCB(self, _type=None, _cb=None):

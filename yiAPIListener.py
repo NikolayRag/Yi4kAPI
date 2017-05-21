@@ -3,7 +3,7 @@ import re, json, threading
 
 
 '''
-Constantly listen to opened Yi4k camera for sultable response.
+Constantly listen to opened Yi4k camera for suitable response.
 Most of response will be the result of commands sent to camera, while some of the responce
 is camera state, pushed periodically.
 '''

@@ -15,7 +15,8 @@ Class usable to pass to YiAPI.cmd()
 		dict of non-changing parameters.
 
 	variable
-		name or list of names to be assigned later with apply()
+		name or list of names to be assigned later with makeCmd().
+		If variable is defined in params as string, it's appended.
 '''
 class YiAPICommandGen():
 	resultReq= None
@@ -44,7 +45,7 @@ class YiAPICommandGen():
 		if params:
 			self.params.update(params)
 
-		if not isinstance(variable, list) and not isinstance(variable, tuple):
+		if not isinstance(variable, (list, tuple)):
 			variable= [variable]
 
 		self.variable= variable
@@ -75,7 +76,11 @@ class YiAPICommandGen():
 			_val= [_val]
 
 		for pair in zip(self.variable,_val):
-			_cmdPrep[pair[0]]= pair[1]
+			if pair[0] in _cmdPrep and isinstance(_cmdPrep[pair[0]], str):
+				if isinstance(pair[1], str):
+					_cmdPrep[pair[0]]+= pair[1]
+			else:
+				_cmdPrep[pair[0]]= pair[1]
 
 
 		return YiAPICommand(_cmdPrep, self.resultReq, self.resultCB)
