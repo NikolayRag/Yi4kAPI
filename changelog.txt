@@ -1,3 +1,10 @@
+v1.4
+	add:
+		- handle connection loss
+		- deleteFile command, path is relative to DCIM folder
+	fix:
+		- getFileList accepts path relative to DCIM folder
+
 v1.3
 	add:
 		- 'start_album' and 'stop_album' events.

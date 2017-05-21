@@ -21,7 +21,7 @@ Commands not implemented:
 		Maybe later
 
 	startRecording datetime
-		Lazy to implement, due to different input value format
+		Lazy to implement due to specific input value format
 '''
 
 
