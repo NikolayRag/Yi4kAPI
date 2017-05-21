@@ -1,17 +1,14 @@
 '''
-Lightweighted version of Yi4k API, reverse-engineered from official Java API.
-It is limited so:
-	- values provided to commands should be correct strings,
-	- camera data exchanging operations are blocking,
-	- no callbacks are supported.
+Lightweighted version of Yi4k API, based on official Java API.
+Values provided to commands should be correct strings.
+
+deleteFile and getFileList commands require path relative to DCIM folder.
+deleteFile though could be unsafe by supplying '..' path.
 
 Commands not implemented:
 
 	formatSDCard
 		NSFW
-
-	deleteFile
-		Considered vulnerable, maybe later
 
 	downloadFile
 	cancelDownload
@@ -24,8 +21,7 @@ Commands not implemented:
 		Maybe later
 
 	startRecording datetime
-		Lazy to implement
-
+		Lazy to implement, due to different input value format
 '''
 
 
@@ -48,11 +44,15 @@ capturePhoto=		YiAPICommandGen(16777220, 'capturePhoto',
 )
 
 getFileList=		YiAPICommandGen(1282, 'getFileList',
-	params= {'param':'/tmp/fuse_d'},
+	params= {'param':'/tmp/fuse_d/DCIM/'},
+	variable= 'param',
 	resultCB= lambda res: res['listing']
 )
 
-#deleteFile=		YiAPICommandGen(1281, 'deleteFile', {}, {'param': '/tmp/fuse_d/DCIM'}, resultCB= lambda res: res['listing'])
+deleteFile=		YiAPICommandGen(1281, 'deleteFile',
+	params= {'param':'/tmp/fuse_d/DCIM/'},
+	variable= 'param'
+)
 
 startViewFinder=		YiAPICommandGen(259, 'startViewFinder')
 stopViewFinder=		YiAPICommandGen(260, 'stopViewFinder')
